@@ -1,0 +1,4 @@
+kaleido
+pandas
+plotly
+yfinance

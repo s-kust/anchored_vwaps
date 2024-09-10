@@ -1,0 +1,2 @@
+first_day_of_year = "2024-01-01 00:00:00"
+DEFAULT_RESULTS_FILE = "ANCHORED_VWAP.png"
