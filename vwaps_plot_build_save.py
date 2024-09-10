@@ -64,6 +64,7 @@ def vwaps_plot_build_save(
         df["Typical"] = (df["Open"] + df["High"] + df["Low"] + df["Close"]) / 4
     df["TypicalMultiplyVolume"] = df["Typical"] * df["Volume"]
 
+    # Add anchored VWAP column for every date passed in anchor_points
     counter = 0
     for anchor_dt in anchor_points:
         counter = counter + 1
@@ -107,6 +108,9 @@ def vwaps_plot_build_save(
     fig.update_layout(
         margin=dict(l=10, r=10, t=10, b=10),
     )
+
+    # TODO improve title, add more info
+
     # Add title to the chart if data is available
     # and increase the top margin to fit the title
     if input_df.attrs:
