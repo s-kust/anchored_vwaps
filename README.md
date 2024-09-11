@@ -30,8 +30,20 @@ def vwaps_plot_build_save(
 
 To plot the anchored VWAPs chart, you'll need a DataFrame that contains the following columns: `Open`, `High`, `Low`, `Close`, and `Volume`. Also, you'll have to provide a list of anchor dates. Ensure the dates in the list are in text format. The function will convert them to `pd.Timestamp` internally.
 
+### ### Clearing Outdated Data from the Chart
+
 By default, the first point on the chart's X-axis will be the earliest date in the anchor dates list. To adjust this behavior, add `x` to the date you want the chart to start. For example, `x2024-08-03 00:00:00` instead of `2024-08-03 00:00:00`.
 
 Anchored VWAPs that start from the first day of the year or the first minute of the trading day are popular and valuable. However, as the year or trading day progresses, these charts can become overburdened and less helpful. For example, the intraday chart below with a 1-minute interval, plotted towards the end of the trading day, is overcrowded. It doesn't allow us to see the details of the recent market activity.
 
 <img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_QQQ_full.png" />
+
+Use the method described above to create a new chart that isn’t cluttered with old data. This approach shows recent market activity clearly. 
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_QQQ_cut.png" />
+
+You won’t need to increase the candle interval, such as switching from one minute to five minutes or from one day to a week.
+
+### Understanding the Source of the Chart Title
+
+Ideally, the `input_df` DataFrame you pass to the function should include an `attrs` attribute that stores the data for the title. The data import functions in the `import_ohlc` folder automatically add this attribute. If you import OHLC data without calling these functions, you can add and populate this attribute yourself.
