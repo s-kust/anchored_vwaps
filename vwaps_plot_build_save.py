@@ -2,6 +2,7 @@ from typing import List, Tuple
 import pandas as pd
 import plotly.graph_objects as go
 from constants import DEFAULT_RESULTS_FILE
+from misc import _check_df_input
 
 
 def _preprocess_anchor_dates(
@@ -31,12 +32,28 @@ def _preprocess_anchor_dates(
     return anchor_points, min_anchor_date
 
 
+def _get_chart_title_annotation(df: pd.DataFrame) -> Tuple[str, str]:
+
+    # NOTE Here we assume that df.attrs exists and contains all required data
+    # because _check_df_input() has not raised any exceptions
+
+    chart_title = df.attrs.copy()
+    try:
+        del chart_title["period"]
+    except KeyError:
+        pass
+    vwap_values = list()
+    vwap_columns = [column for column in df.columns if column.startswith("A_VWAP_")]
+    for vwap_column in vwap_columns:
+        vwap_values.append(round(df[vwap_column].iloc[-1], 2))
+    return str(chart_title), str(sorted(vwap_values))
+
+
 def vwaps_plot_build_save(
     input_df: pd.DataFrame,
     anchor_dates: List[str],
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
-    hide_extended_hours=True,
 ):
     """
     1. Transform every element of anchor_dates to pd.Timestamp.
@@ -50,6 +67,7 @@ def vwaps_plot_build_save(
     See example in the readme.
     """
 
+    _check_df_input(df=input_df)
     df = input_df.copy()
 
     # Otherwise, TypeError: Invalid comparison between
@@ -105,38 +123,50 @@ def vwaps_plot_build_save(
             ),
         )
     fig = go.Figure(data=plot_data)
-    fig.update_layout(
-        margin=dict(l=10, r=10, t=10, b=10),
-    )
+    # fig.update_layout(
+    #     margin=dict(l=10, r=10, t=10, b=10),
+    # )
 
-    # TODO improve title, add more info
+    # # TODO improve title, add more info
+    # # TODO add latest values ​of VWAPs ​to title
+    chart_title, chart_annotation = _get_chart_title_annotation(df=df)
 
     # Add title to the chart if data is available
     # and increase the top margin to fit the title
-    if input_df.attrs:
-        fig.update_layout(
-            title=f"{input_df.attrs}",
-            title_x=0.5,
-            title_y=0.99,
-            margin=dict(l=10, r=10, t=20, b=10),
-        )
-    # TODO add latest values ​of VWAPs ​to title
+    fig.update_layout(
+        # title=f"{chart_title}",
+        title=chart_title,
+        title_x=0.5,
+        title_y=0.99,
+        margin=dict(l=10, r=10, t=20, b=10),
+    )
+    fig.add_annotation(
+        xref="x domain",
+        yref="y domain",
+        x=0.01,
+        y=0.99,
+        text="VWAPs last values: " + chart_annotation,
+        showarrow=False,
+        # row=1,
+        # col=1,
+    )
+
     fig.update_xaxes(
         rangeslider_visible=False,
         rangebreaks=[
             dict(bounds=["sat", "mon"]),  # hide weekends, Saturday to before Monday
         ],
     )
-    if hide_extended_hours:
-        fig.update_xaxes(
-            rangebreaks=[
-                dict(
-                    # NOTE You may have to adjust these bounds for hours
-                    bounds=[21, 13.5],
-                    pattern="hour",
-                ),  # hide hours outside of trading hours, in my case 21:00-13:30
-            ],
-        )
+    # if hide_extended_hours:
+    #     fig.update_xaxes(
+    #         rangebreaks=[
+    #             dict(
+    #                 # NOTE You may have to adjust these bounds for hours
+    #                 bounds=[21, 13.5],
+    #                 pattern="hour",
+    #             ),  # hide hours outside of trading hours, in my case 21:00-13:30
+    #         ],
+    #     )
 
     fig.update_layout(showlegend=False)
 
