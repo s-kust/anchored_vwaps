@@ -30,3 +30,8 @@ def vwaps_plot_build_save(
 
 To plot the anchored VWAPs chart, you'll need a DataFrame that contains the following columns: `Open`, `High`, `Low`, `Close`, and `Volume`. Also, you'll have to provide a list of anchor dates. Ensure the dates in the list are in text format. The function will convert them to `pd.Timestamp` internally.
 
+By default, the first point on the chart's X-axis will be the earliest date in the anchor dates list. To adjust this behavior, add `x` to the date you want the chart to start. For example, `x2024-08-03 00:00:00` instead of `2024-08-03 00:00:00`.
+
+Anchored VWAPs that start from the first day of the year or the first minute of the trading day are popular and valuable. However, as the year or trading day progresses, these charts can become overburdened and less helpful. For example, the intraday chart below with a 1-minute interval, plotted towards the end of the trading day, is overcrowded. It doesn't allow us to see the details of the recent market activity.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_QQQ_full.png" />
