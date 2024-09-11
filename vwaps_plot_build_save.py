@@ -54,6 +54,7 @@ def vwaps_plot_build_save(
     anchor_dates: List[str],
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
+    hide_extended_hours: bool = False,
 ):
     """
     1. Transform every element of anchor_dates to pd.Timestamp.
@@ -157,16 +158,16 @@ def vwaps_plot_build_save(
             dict(bounds=["sat", "mon"]),  # hide weekends, Saturday to before Monday
         ],
     )
-    # if hide_extended_hours:
-    #     fig.update_xaxes(
-    #         rangebreaks=[
-    #             dict(
-    #                 # NOTE You may have to adjust these bounds for hours
-    #                 bounds=[21, 13.5],
-    #                 pattern="hour",
-    #             ),  # hide hours outside of trading hours, in my case 21:00-13:30
-    #         ],
-    #     )
+    if hide_extended_hours and (input_df.attrs["interval"] != "1d"):
+        fig.update_xaxes(
+            rangebreaks=[
+                dict(
+                    # NOTE You may have to adjust these bounds for hours
+                    bounds=[21, 13.5],
+                    pattern="hour",
+                ),  # hide hours outside of trading hours, in my case 21:00-13:30
+            ],
+        )
 
     fig.update_layout(showlegend=False)
 
