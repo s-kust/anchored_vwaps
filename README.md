@@ -14,7 +14,7 @@ You can import the functions into the `run_main.py` file and run them from there
 2. Try to understand in detail how the function `vwaps_plot_build_save` works. 
 3. Check out the `draw_all_daily_charts` function. It can be helpful to run this function before the beginning of each trading day.
 4. Take a look at the function `draw_daily_chart_ticker`. It will come in handy when you need to quickly draw a daily chart for some ticker. An example of its usage is in the `run_main.py` file.
-5. If you want, try using the function `draw_qqq_intraday` in the `run_main.py` file for intraday trading.
+5. *Advanced, optional* If you want, try to use the function `draw_qqq_intraday` in the `run_main.py` file for intraday trading.
 
 ## Constructing OHLC Charts with Anchored VWAPs
 
@@ -26,6 +26,7 @@ def vwaps_plot_build_save(
     anchor_dates: List[str],
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
+    hide_extended_hours: bool = False,
 ):
 ```
 
@@ -47,7 +48,7 @@ You won’t need to increase the candle interval, such as switching from one min
 
 ### Understanding the Source of the Chart Title
 
-Ideally, the `input_df` DataFrame you pass to the function should include an `attrs` attribute that stores the data for the title. The data import functions in the `import_ohlc` folder automatically add this attribute. If you import OHLC data without calling these functions, you can add and populate this attribute yourself.
+The `input_df` DataFrame you pass to the function should include an `attrs` attribute that stores the data for the title. The data import functions in the `import_ohlc` folder automatically add this attribute. If you import OHLC data without calling these functions, you can add and populate this attribute yourself. For details, see the code of the `_check_df_input` function.
 
 ## Effortlessly Tracking Your Favorite Stocks and ETFs
 
@@ -55,4 +56,14 @@ The `ticker_anchors.py` file contains a dictionary where you can store the ticke
 
 You can modify the value of `first_day_of_year` in the `constants.py` file. It’s generally better not to set it to the first day of the current year in January. Instead, consider waiting until February or even March before updating this value.
 
-See also the function `draw_daily_chart_ticker`. It will come in handy when you need to quickly draw a daily chart for some ticker. An example of its usage is in the `run_main.py` file.
+See also the function `draw_daily_chart_ticker`. It will come in handy when you need to quickly draw a daily chart for some ticker. Fill in the ticker and anchor dates, then call it as shown below.
+
+```python
+ticker = "NVDA"
+anchor_dates = [
+    "2024-01-01 00:00:00",
+] + ["2024-08-03 00:00:00", "2024-07-11 00:00:00"]
+draw_daily_chart_ticker(ticker=ticker, anchor_dates=anchor_dates)
+```
+
+Check the function code to see how the `.png` file name for saving the chart is generated.
