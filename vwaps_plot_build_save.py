@@ -120,7 +120,7 @@ def vwaps_plot_build_save(
             title_y=0.99,
             margin=dict(l=10, r=10, t=20, b=10),
         )
-
+    # TODO add latest values ​of VWAPs ​to title
     fig.update_xaxes(
         rangeslider_visible=False,
         rangebreaks=[
