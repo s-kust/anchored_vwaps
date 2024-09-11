@@ -2,6 +2,8 @@
 
 This repository provides Python code for adding anchored VWAPs to OHLC data, generating charts, and saving them as `.png` files. It can help you apply the trading strategies described in Brian Shannon's book, *Maximum Trading Gains with Anchored VWAP*. The precondition is that you're familiar with running Python scripts and have some knowledge of Pandas. 
 
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/daily_chart_example.png" />
+
 The principal function `vwaps_plot_build_save` is located in a file of the same name in the root folder. Additionally, the repository includes several other functions that use this function. These functions build and save daily charts and charts with intervals of 1 to 60 minutes. There are also functions in the `import_ohlc` folder for importing OHLC data from ~~various providers~~ Yahoo Finance.
 
 ## How to Use This Repository
