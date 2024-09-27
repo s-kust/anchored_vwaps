@@ -1,6 +1,8 @@
 from typing import List, Tuple
+
 import pandas as pd
 import plotly.graph_objects as go
+
 from constants import DEFAULT_RESULTS_FILE
 from misc import _check_df_input
 
@@ -100,7 +102,7 @@ def vwaps_plot_build_save(
 
     df = df[df.index >= min_anchor_point]
     if print_df:
-        print(df)
+        print(df[["Open", "High", "Low", "Close", "Volume"]])
     # df.to_excel("DF_before_plot_VWAP.xlsx")
     del df["TypicalMultiplyVolume"]
     del df["Typical"]
