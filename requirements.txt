@@ -1,4 +1,5 @@
 kaleido
+mplfinance
 pandas
 plotly
 yfinance
