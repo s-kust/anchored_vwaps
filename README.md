@@ -24,6 +24,8 @@ The primary function responsible for building and saving Anchored VWAPs charts i
 def vwaps_plot_build_save(
     input_df: pd.DataFrame,
     anchor_dates: List[str],
+    chart_title: str = "",
+    chart_annotation_func: Callable = get_chart_annotation,
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
     hide_extended_hours: bool = False,
@@ -45,10 +47,6 @@ Use the method described above to create a new chart that isn’t cluttered with
 <img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_QQQ_cut.png" />
 
 You won’t need to increase the candle interval, such as switching from one minute to five minutes or from one day to a week.
-
-### Understanding the Source of the Chart Title
-
-The `input_df` DataFrame you pass to the function should include an `attrs` attribute that stores the data for the title. The data import functions in the `import_ohlc` folder automatically add this attribute. If you import OHLC data without calling these functions, you can add and populate this attribute yourself. For details, see the code of the `_check_df_input` function.
 
 ## Effortlessly Tracking Your Favorite Stocks and ETFs
 
