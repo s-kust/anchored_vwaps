@@ -16,8 +16,8 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
     """
     For every ticker in ticker_anchors draw and save
     two daily OHLC + VWAPs charts.
-    Chart 1 - with year's 1st day VWAP added.
-    Chart 2 - without year's 1st day VWAP.
+    Chart 1: with year's 1st day VWAP added.
+    Chart 2: without year's 1st day VWAP.
     """
 
     total_count = len(ticker_anchors)
@@ -29,8 +29,8 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
             f"draw_all_daily_charts: running {ticker=} - {counter} of {total_count}..."
         )
         hist = get_ohlc_func(ticker=ticker, period="2y", interval=interval)
-        # anchor_dates_2 = ticker_anchors[ticker]
-        anchor_dates_2: List[str] = list()
+        anchor_dates_2: List[str] = ticker_anchors[ticker]
+        # anchor_dates_2: List[str] = list()
         anchor_dates_1 = anchor_dates_2 + [first_day_of_year]
         chart_title = {"ticker": ticker, "interval": interval}
         chart_title_str = str(chart_title)
