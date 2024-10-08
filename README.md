@@ -14,7 +14,7 @@ You can import the functions into the `run_main.py` file and run them from there
 2. Try to understand in detail how the function `vwaps_plot_build_save` works. 
 3. Check out the `draw_all_daily_charts` function. It can be helpful to run this function before the beginning of each trading day.
 4. Take a look at the function `draw_daily_chart_ticker`. It will come in handy when you need to quickly draw a daily chart for some ticker. An example of its usage is in the `run_main.py` file.
-5. *Advanced, optional* If you want, try to use the function `draw_qqq_intraday` in the `run_main.py` file for intraday trading.
+5. *Advanced, optional, risky* If you want, try to use the function `draw_qqq_intraday` in the `run_main.py` file for intraday trading.
 
 ## Constructing OHLC Charts with Anchored VWAPs
 
@@ -26,6 +26,7 @@ def vwaps_plot_build_save(
     anchor_dates: List[str],
     chart_title: str = "",
     chart_annotation_func: Callable = get_chart_annotation,
+    add_last_min_max: bool = False,
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
     hide_extended_hours: bool = False,
@@ -47,6 +48,58 @@ Use the method described above to create a new chart that isn’t cluttered with
 <img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_QQQ_cut.png" />
 
 You won’t need to increase the candle interval, such as switching from one minute to five minutes or from one day to a week.
+
+### Adding Last Min and Max Anchored VWAPS Automatically
+
+I have found that VWAPs anchored to the dates of the last minimum and maximum are very important. They are more significant than the *Maximum Trading Gains with Anchored VWAP* book says. Therefore, the `vwaps_plot_build_save` function acquired an additional parameter `add_last_min_max`. It saves me a lot of time and effort because I no longer have to follow and update these dates in the `ticker_anchors` dict.
+
+For intraday charts, VWAPs anchored to the dates of the last minimum and maximum are of little help. They are usually redundant. When building such charts, it is better not to add them.
+
+### Customizing Chart Title and Annotation
+
+Creating chart titles is straightforward. You can refer to the example below in the section on drawing intraday charts. Also, explore the code of the `get_chart_annotation` function to see what information is included in the default annotation. 
+
+You may want to put different data in the titles and annotations of your charts. To make the annotation more informative, consider modifying the `get_chart_annotation` function. It is even better to create one or more custom annotation functions. Refer to the `get_custom_chart_annotation_1d` function as an example. 
+
+## Drawing Intraday Charts
+
+To draw intraday charts, you can use the following function as inspiration and a starting example.
+
+```python
+def draw_qqq_intraday():
+    ticker = "QQQ"
+    interval = "1m"
+    hist = get_ohlc_from_yf(ticker=ticker, period="2d", interval=interval)
+    anchor_dates = [
+        "2024-10-07 13:30:00",
+        "2024-10-07 18:00:00",
+        "2024-10-07 19:42:00",
+    ]
+    chart_title = {"ticker": ticker, "interval": interval}
+    chart_title_str = str(chart_title)
+    vwaps_plot_build_save(
+        input_df=hist,
+        anchor_dates=anchor_dates,
+        chart_title=chart_title_str,
+        chart_annotation_func=get_chart_annotation,
+        add_last_min_max=False,
+        file_name=f"intraday_{ticker}.png",
+        print_df=True,
+        hide_extended_hours=True,
+    )
+```
+
+At the start of the trading day, you only have the initial date and time to build the first and most important Anchored VWAP. As the day progresses, other key anchor points gradually become evident.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_1.png" />
+
+Throughout the day, you might want to tidy up the chart by removing outdated data. Rather than increasing the candle interval, you can set one of your Anchored VWAPs as the minimum threshold for the X-axis.
+
+For example, this is what happened after I replaced `2024-10-07 18:00:00` with `x2024-10-07 18:00:00` in the `anchor_dates` list.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/intraday_2.png" />
+
+It's a good idea to set the `print_df` parameter to `True`. It allows you to monitor the quality of the intraday data you receive from your provider using the DataFrame's tail displayed on the screen.
 
 ## Effortlessly Tracking Your Favorite Stocks and ETFs
 
