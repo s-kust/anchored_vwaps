@@ -21,5 +21,6 @@ def draw_daily_chart_ticker(
         anchor_dates=anchor_dates,
         chart_title=str(chart_title),
         chart_annotation_func=get_custom_chart_annotation_1d,
+        add_last_min_max=True,
         file_name=f"daily_{ticker}.png",
     )

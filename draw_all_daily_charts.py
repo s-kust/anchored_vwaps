@@ -39,6 +39,7 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
             anchor_dates=anchor_dates_1,
             chart_annotation_func=get_custom_chart_annotation_1d,
             chart_title=chart_title_str,
+            add_last_min_max=True,
             file_name=f"daily_{ticker}_1.png",
             print_df=False,
         )
@@ -47,6 +48,7 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
             anchor_dates=anchor_dates_2,
             chart_annotation_func=get_custom_chart_annotation_1d,
             chart_title=chart_title_str,
+            add_last_min_max=True,
             file_name=f"daily_{ticker}_2.png",
             print_df=False,
         )

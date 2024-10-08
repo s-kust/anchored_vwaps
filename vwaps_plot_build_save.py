@@ -1,4 +1,4 @@
-from typing import Callable, List, Set, Tuple
+from typing import Callable, List, Optional, Set, Tuple
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -7,23 +7,41 @@ from constants import ATR_SMOOTHING_N, DEFAULT_RESULTS_FILE
 from misc import fill_is_min_max
 
 
-def _preprocess_anchor_dates(
-    df: pd.DataFrame,
-    anchor_dates: List[str],
-) -> Tuple[Set[pd.Timestamp], pd.Timestamp]:
+def _add_last_min_max_dates(
+    input_df: pd.DataFrame, anchor_dates: Set[pd.Timestamp]
+) -> Tuple[pd.DataFrame, Set[pd.Timestamp]]:
     """
-    1. Convert a list of strings to a list of Timestamps.
-    2. Add last_min_date and last_max_date to the list of anchor dates.
-    3. Find the minimum date.
+    Add dates of last min and max to the set of dates.
     """
-
+    df = input_df.copy()
+    if (
+        f"atr_{ATR_SMOOTHING_N}" not in df.columns
+        or "is_min" not in df.columns
+        or "is_max" not in df.columns
+    ):
+        df = fill_is_min_max(df=df)
     last_min_date = df[df["is_min"] == True].index.max()
     last_max_date = df[df["is_max"] == True].index.max()
+    anchor_dates.update({last_min_date, last_max_date})
+
+    # NOTE return not only anchor_dates but also pd.DataFrame,
+    # because you may want later to use somewhere
+    # the new columns is_min, is_max, atr_{ATR_SMOOTHING_N}
+    return df, anchor_dates
+
+
+def _preprocess_anchor_dates(
+    anchor_dates: List[str],
+) -> Tuple[Set[pd.Timestamp], Optional[pd.Timestamp]]:
+    """
+    1. Convert a list of strings to a list of Timestamps.
+    2. Search for the x-marked minimum threshold date.
+    """
 
     # NOTE If an element with anchor_date[0] == "x" is found
     # in the anchor_dates list, it is assigned to min_anchor_date.
-    # Otherwise, min_anchor_date = min(anchor_points).
-    # The benefits of this feature are explained in the readme doc.
+    # Otherwise, min_anchor_date remains None.
+    # The benefits of this feature are explained in the ReadMe doc.
 
     min_anchor_date = None
     for anchor_date in anchor_dates:
@@ -34,17 +52,7 @@ def _preprocess_anchor_dates(
         for anchor_date in anchor_dates
     ]
     anchor_points = [pd.to_datetime(anchor_dt_str) for anchor_dt_str in anchor_points]
-
-    # NOTE Here we add last_min_date last_max_date
-    # and later draw them on the chart,
-    # because these Anchored VWAPs are important.
-    anchor_points = anchor_points + [last_min_date, last_max_date]
-
-    anchor_points_to_return: Set[pd.Timestamp] = set(anchor_points)
-    if min_anchor_date is None:
-        min_anchor_date = min(anchor_points)
-
-    return anchor_points_to_return, min_anchor_date
+    return set(anchor_points), min_anchor_date
 
 
 def get_chart_annotation(df: pd.DataFrame) -> str:
@@ -59,7 +67,7 @@ def get_chart_annotation(df: pd.DataFrame) -> str:
     )
     # NOTE You can add additional information to the annotation here,
     # or preferably write a custom function and pass it as a chart_annotation_func parameter
-    #  when calling the function vwaps_plot_build_save.
+    # when calling the function vwaps_plot_build_save.
     # See the get_custom_chart_annotation_1d function as an example.
     return res_to_return
 
@@ -69,6 +77,7 @@ def vwaps_plot_build_save(
     anchor_dates: List[str],
     chart_title: str = "",
     chart_annotation_func: Callable = get_chart_annotation,
+    add_last_min_max: bool = False,
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
     hide_extended_hours: bool = False,
@@ -86,20 +95,20 @@ def vwaps_plot_build_save(
     """
 
     df = input_df.copy()
-    if (
-        f"atr_{ATR_SMOOTHING_N}" not in df.columns
-        or "is_min" not in df.columns
-        or "is_max" not in df.columns
-    ):
-        df = fill_is_min_max(df=df)
 
     # Otherwise, TypeError: Invalid comparison between
     # dtype=datetime64[ns, America/New_York] and Timestamp
     df.index = df.index.tz_convert(None)
 
-    anchor_points, min_anchor_point = _preprocess_anchor_dates(
-        df=df, anchor_dates=anchor_dates
+    anchor_points, min_threshold_point = _preprocess_anchor_dates(
+        anchor_dates=anchor_dates
     )
+    if add_last_min_max:
+        df, anchor_points = _add_last_min_max_dates(
+            input_df=df, anchor_dates=anchor_points
+        )
+    if min_threshold_point is None:
+        min_threshold_point = min(anchor_points)
 
     if "Typical" not in df.columns:
         df["Typical"] = (df["Open"] + df["High"] + df["Low"] + df["Close"]) / 4
@@ -121,7 +130,8 @@ def vwaps_plot_build_save(
             .cumsum()
         )
 
-    df = df[df.index >= min_anchor_point]
+    df = df[df.index >= min_threshold_point]
+
     if print_df:
         print(df[["Open", "High", "Low", "Close", "Volume"]])
     # df.to_excel("DF_before_plot_VWAP.xlsx")
