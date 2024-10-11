@@ -14,7 +14,7 @@ def draw_daily_chart_ticker(
     ticker: str, anchor_dates: List[str], get_ohlc_func: Callable = get_ohlc_from_yf
 ):
     interval = "1d"
-    hist = get_ohlc_func(ticker=ticker, period="2y", interval=interval)
+    hist = get_ohlc_func(ticker=ticker, period="max", interval=interval)
     chart_title = {"ticker": ticker, "interval": interval}
     vwaps_plot_build_save(
         input_df=hist,

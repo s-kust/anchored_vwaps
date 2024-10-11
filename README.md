@@ -33,7 +33,7 @@ def vwaps_plot_build_save(
 ):
 ```
 
-To plot the anchored VWAPs chart, you'll need a DataFrame that contains the following columns: `Open`, `High`, `Low`, `Close`, and `Volume`. Also, you'll have to provide a list of anchor dates. Ensure the dates in the list are in text format. The function will convert them to `pd.Timestamp` internally.
+To plot the anchored VWAPs chart, you'll need a DataFrame that contains the following columns: `Open`, `High`, `Low`, `Close`, and `Volume`. Also, you'll have to provide a list of anchor dates.
 
 ### Clearing Outdated Data from the Chart
 
@@ -51,15 +51,15 @@ You won’t need to increase the candle interval, such as switching from one min
 
 ### Adding Last Min and Max Anchored VWAPS Automatically
 
-I have found that VWAPs anchored to the dates of the last minimum and maximum are very important. They are more significant than the *Maximum Trading Gains with Anchored VWAP* book says. Therefore, the `vwaps_plot_build_save` function acquired an additional parameter `add_last_min_max`. It saves me a lot of time and effort because I no longer have to follow and update these dates in the `ticker_anchors` dict.
+I have found that VWAPs anchored to the dates of the last minimum and maximum are very important for swing trading. They are more significant than the *Maximum Trading Gains with Anchored VWAP* book says. Therefore, the `vwaps_plot_build_save` function acquired an additional parameter `add_last_min_max`. It saves me a lot of time and effort because I no longer have to follow and update these dates manually.
 
 For intraday charts, VWAPs anchored to the dates of the last minimum and maximum are of little help. They are usually redundant. When building such charts, it is better not to add them.
 
 ### Customizing Chart Title and Annotation
 
-Creating chart titles is straightforward. You can refer to the example below in the section on drawing intraday charts. Also, explore the code of the `get_chart_annotation` function to see what information is included in the default annotation. 
+Creating chart titles is straightforward. You can refer to the example below in the section on drawing intraday charts. Also, explore the code of the `get_custom_chart_annotation_1d` function to see what information is included in the default annotation. 
 
-You may want to put different data in the titles and annotations of your charts. To make the annotation more informative, consider modifying the `get_chart_annotation` function. It is even better to create one or more custom annotation functions. Refer to the `get_custom_chart_annotation_1d` function as an example. 
+You may want to put different data in the titles and annotations of your charts. To make the annotation more informative, consider modifying the `get_custom_chart_annotation_1d` function. It is even better to create one or more custom annotation functions.
 
 ## Drawing Intraday Charts
 
@@ -103,7 +103,23 @@ It's a good idea to set the `print_df` parameter to `True`. It allows you to mon
 
 ## Effortlessly Tracking Your Favorite Stocks and ETFs
 
-The `ticker_anchors.py` file contains a dictionary where you can store the tickers you're interested in, along with their anchor dates. When you run the `draw_all_daily_charts` function, it generates two updated charts for each ticker listed in the dictionary. The first chart shows anchored VWAPs starting from the dates specified in the list. The second chart includes all the data from the first chart, plus an additional anchored VWAP that starts from the `first_day_of_year`.
+The `draw_all_daily_charts` function makes it easy to build updated charts for all the tickers you're tracking. Previously, these charts primarily depended on custom anchor dates provided by the user. While the option to add custom anchor dates remains, you can now generate helpful charts without needing to specify them.
+
+Key dates include January 1 of the current year and the dates of recent significant price highs and lows. The system automatically adds VWAPs anchored to these material dates to the chart. 
+
+Below is an example of a daily OHLC chart that doesn't include any custom anchor dates but features a custom annotation.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/daily_chart_example_2.png" />
+
+Before running the `draw_all_daily_charts` function, enter the tickers you're interested in into the `tickers_follow_daily.xlsx` file. This file contains two worksheets. On the first worksheet, specify the tickers and any relevant notes, as shown in the image below. Adding notes is optional.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_1_notes.png" />
+
+On the second worksheet, enter the tickers in the columns and list their custom anchor dates below them. If you place an "X" before a date, the system will use that date as the minimum threshold for the chart's X-axis.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_2_anchors.png" />
+
+For every ticker you are interested in, you can specify one or more custom anchor dates or none at all. The charts remain highly useful even without custom dates. If you don't want to assign custom anchor dates, there is no need to enter that ticker on the second worksheet.
 
 You can modify the value of `first_day_of_year` in the `constants.py` file. It’s generally better not to set it to the first day of the current year in January. Instead, consider waiting until February or even March before updating this value.
 

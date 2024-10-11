@@ -1,10 +1,11 @@
+import datetime
 from typing import Callable, List, Optional, Set, Tuple
 
 import pandas as pd
 import plotly.graph_objects as go
 
 from constants import ATR_SMOOTHING_N, DEFAULT_RESULTS_FILE
-from misc import fill_is_min_max
+from misc import fill_is_min_max, get_custom_chart_annotation_1d
 
 
 def _add_last_min_max_dates(
@@ -45,38 +46,30 @@ def _preprocess_anchor_dates(
 
     min_anchor_date = None
     for anchor_date in anchor_dates:
+        if isinstance(anchor_date, datetime.datetime):
+            continue
         if anchor_date[0] == "x":
             min_anchor_date = pd.to_datetime(anchor_date[1:])
     anchor_points = [
-        anchor_date[1:] if anchor_date[0] == "x" else anchor_date
+        anchor_date[1:]
+        if not isinstance(anchor_date, datetime.datetime) and anchor_date[0] == "x"
+        else anchor_date
         for anchor_date in anchor_dates
     ]
-    anchor_points = [pd.to_datetime(anchor_dt_str) for anchor_dt_str in anchor_points]
+    anchor_points = [
+        pd.to_datetime(anchor_date)
+        if not isinstance(anchor_date, datetime.datetime)
+        else anchor_date
+        for anchor_date in anchor_points
+    ]
     return set(anchor_points), min_anchor_date
-
-
-def get_chart_annotation(df: pd.DataFrame) -> str:
-
-    vwap_values = list()
-    vwap_columns = [column for column in df.columns if column.startswith("A_VWAP_")]
-    for vwap_column in vwap_columns:
-        vwap_values.append(round(df[vwap_column].iloc[-1], 2))
-    res_to_return = "VWAPs last values: " + str(sorted(vwap_values))
-    res_to_return = (
-        res_to_return + "; Closed last: " + str(round(df[f"Close"].values[-1], 2))
-    )
-    # NOTE You can add additional information to the annotation here,
-    # or preferably write a custom function and pass it as a chart_annotation_func parameter
-    # when calling the function vwaps_plot_build_save.
-    # See the get_custom_chart_annotation_1d function as an example.
-    return res_to_return
 
 
 def vwaps_plot_build_save(
     input_df: pd.DataFrame,
     anchor_dates: List[str],
     chart_title: str = "",
-    chart_annotation_func: Callable = get_chart_annotation,
+    chart_annotation_func: Callable = get_custom_chart_annotation_1d,
     add_last_min_max: bool = False,
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
