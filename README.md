@@ -113,11 +113,11 @@ Below is an example of a daily OHLC chart that doesn't include any custom anchor
 
 Before running the `draw_all_daily_charts` function, enter the tickers you're interested in into the `tickers_follow_daily.xlsx` file. This file contains two worksheets. On the first worksheet, specify the tickers and any relevant notes, as shown in the image below. Adding notes is optional.
 
-<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_1_notes.png" />
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_1_notes.PNG" />
 
 On the second worksheet, enter the tickers in the columns and list their custom anchor dates below them. If you place an "X" before a date, the system will use that date as the minimum threshold for the chart's X-axis.
 
-<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_2_anchors.png" />
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/tickers_follow_2_anchors.PNG" />
 
 For every ticker you are interested in, you can specify one or more custom anchor dates or none at all. The charts remain highly useful even without custom dates. If you don't want to assign custom anchor dates, there is no need to enter that ticker on the second worksheet.
 
@@ -134,3 +134,24 @@ draw_daily_chart_ticker(ticker=ticker, anchor_dates=anchor_dates)
 ```
 
 Check the function code to see how the `.png` file name for saving the chart is generated.
+
+## Visualizing the 5-Day Moving Average
+
+Brian Shannon, author of *Maximum Trading Gains with Anchored VWAP*, emphasizes the importance of 5-day moving averages, particularly on 15-minute and 30-minute candlestick charts. You can use the `draw_5_days_avg` function to plot such charts.
+
+Its declaration:
+
+```python
+def draw_5_days_avg(ticker: str, interval: str = "15m"):
+    """
+    Create and save plot 5_d_avg_{ticker}.png
+    containing OHLC candles and 5 days simple moving average (SMA).
+    Usage: avoid buying the dip until the price consolidates above 5 days SMA.
+    For details, see Appendix B
+    of the book "Maximum Trading Gains With Anchored VWAP".
+    """
+```
+
+Here is an example of a chart produced by this function.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/5_d_avg_IWM.png" />
