@@ -73,7 +73,7 @@ def draw_all_daily_charts(
         vwaps_plot_build_save(
             input_df=ohlc_df,
             anchor_dates=custom_anchor_dates,
-            chart_annotation_func=get_chart_annotation_1d,
+            chart_annotation_func=chart_annotation_func,
             chart_title=chart_title_str,
             add_last_min_max=True,
             file_name=f"daily_{ticker}_2.png",
