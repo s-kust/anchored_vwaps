@@ -3,7 +3,7 @@ import pandas as pd
 from constants import ATR_SMOOTHING_N
 
 
-def get_custom_chart_annotation_1d(df: pd.DataFrame) -> str:
+def get_chart_annotation_1d(df: pd.DataFrame) -> str:
     """
     Get custom chart annotation for OHLC daily (1d) charts
     """

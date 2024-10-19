@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from constants import ATR_SMOOTHING_N, DEFAULT_RESULTS_FILE
-from misc import fill_is_min_max, get_custom_chart_annotation_1d
+from misc import fill_is_min_max, get_chart_annotation_1d
 
 
 def _add_last_min_max_dates(
@@ -69,7 +69,7 @@ def vwaps_plot_build_save(
     input_df: pd.DataFrame,
     anchor_dates: List[str],
     chart_title: str = "",
-    chart_annotation_func: Callable = get_custom_chart_annotation_1d,
+    chart_annotation_func: Callable = get_chart_annotation_1d,
     add_last_min_max: bool = False,
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,

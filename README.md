@@ -57,9 +57,9 @@ For intraday charts, VWAPs anchored to the dates of the last minimum and maximum
 
 ### Customizing Chart Title and Annotation
 
-Creating chart titles is straightforward. You can refer to the example below in the section on drawing intraday charts. Also, explore the code of the `get_custom_chart_annotation_1d` function to see what information is included in the default annotation. 
+Creating chart titles is straightforward. You can refer to the example below in the section on drawing intraday charts. Also, explore the code of the `get_chart_annotation_1d` function to see what information is included in the default annotation. 
 
-You may want to put different data in the titles and annotations of your charts. To make the annotation more informative, consider modifying the `get_custom_chart_annotation_1d` function. It is even better to create one or more custom annotation functions.
+You may want to put different data in the titles and annotations of your charts. To make the annotation more informative, consider modifying the `get_chart_annotation_1d` function. It is even better to create one or more custom annotation functions.
 
 ## Drawing Intraday Charts
 

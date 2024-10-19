@@ -4,7 +4,7 @@ import pandas as pd
 
 from constants import first_day_of_year
 from import_ohlc import get_ohlc_from_yf
-from misc import get_custom_chart_annotation_1d
+from misc import get_chart_annotation_1d
 from vwaps_plot_build_save import vwaps_plot_build_save
 
 # NOTE In case of problems with Yahoo Finance,
@@ -13,7 +13,10 @@ from vwaps_plot_build_save import vwaps_plot_build_save
 # For example, from Alpha Vantage.
 
 
-def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
+def draw_all_daily_charts(
+    get_ohlc_func: Callable = get_ohlc_from_yf,
+    chart_annotation_func: Callable = get_chart_annotation_1d,
+):
     """
     For every ticker in tickers_notes draw and save
     two daily OHLC + VWAPs charts.
@@ -61,7 +64,7 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
         vwaps_plot_build_save(
             input_df=ohlc_df,
             anchor_dates=all_anchor_dates,
-            chart_annotation_func=get_custom_chart_annotation_1d,
+            chart_annotation_func=chart_annotation_func,
             chart_title=chart_title_str,
             add_last_min_max=True,
             file_name=f"daily_{ticker}_1.png",
@@ -70,7 +73,7 @@ def draw_all_daily_charts(get_ohlc_func: Callable = get_ohlc_from_yf):
         vwaps_plot_build_save(
             input_df=ohlc_df,
             anchor_dates=custom_anchor_dates,
-            chart_annotation_func=get_custom_chart_annotation_1d,
+            chart_annotation_func=get_chart_annotation_1d,
             chart_title=chart_title_str,
             add_last_min_max=True,
             file_name=f"daily_{ticker}_2.png",
