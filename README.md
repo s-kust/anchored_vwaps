@@ -155,3 +155,7 @@ def draw_5_days_avg(ticker: str, interval: str = "15m"):
 Here is an example of a chart produced by this function.
 
 <img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/5_d_avg_IWM.png" />
+
+You can follow me on [Twitter](https://x.com/kust1983) and connect with me on [LinkedIn](https://www.linkedin.com/in/kushchenko/).
+
+See also my [Trading strategy template](https://github.com/s-kust/python-backtesting-template) that uses Python `backtesting` library.
