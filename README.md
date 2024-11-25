@@ -156,6 +156,20 @@ Here is an example of a chart produced by this function.
 
 <img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/5_d_avg_IWM.png" />
 
+## Visualizing the Close-Close Ratio
+
+```python
+from draw_ratio import draw_ratio
+...
+draw_ratio(ticker_1="IWM", ticker_2="QQQ", cutoff_date="2020-01-01")
+```
+
+Here the result.
+
+<img src="https://github.com/s-kust/anchored_vwaps/blob/main/pics/ratio_IWM_QQQ.png" />
+
+## Contacts
+
 You can follow me on [Twitter](https://x.com/kust1983) and connect with me on [LinkedIn](https://www.linkedin.com/in/kushchenko/).
 
 See also my [Trading strategy template](https://github.com/s-kust/python-backtesting-template) that uses Python `backtesting` library.
