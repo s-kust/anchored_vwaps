@@ -101,43 +101,54 @@ def create_candlestick_volume_chart(
     return fig
 
 
-# Example usage
-def generate_sample_data() -> pd.DataFrame:
-    """Generate sample stock data for demonstration"""
-    dates = pd.date_range(start="2023-01-01", end="2023-12-31", freq="B")
+def draw_profile_of_data(ohlc_df: pd.DataFrame, ticker: str) -> None:
+    """
+    1. Run create_candlestick_volume_chart.
+    2. Save png file
+    """
 
-    np.random.seed(42)
+    figure = create_candlestick_volume_chart(ohlc_df, ticker=ticker)
 
-    open_prices = 100 + np.cumsum(np.random.normal(0, 1, len(dates)))
-    close_prices = open_prices + np.random.normal(0, 2, len(dates))
-    high_prices = np.maximum(open_prices, close_prices) + np.abs(
-        np.random.normal(0, 1, len(dates))
-    )
-    low_prices = np.minimum(open_prices, close_prices) - np.abs(
-        np.random.normal(0, 1, len(dates))
-    )
-    volumes = np.random.randint(1000000, 5000000, len(dates))
-
-    df = pd.DataFrame(
-        {
-            "Date": dates,
-            "Open": open_prices,
-            "High": high_prices,
-            "Low": low_prices,
-            "Close": close_prices,
-            "Volume": volumes,
-        }
-    )
-    return df
+    all_index_dates = set(ohlc_df.index.date)  # type: ignore
+    len_all_index_dates = len(all_index_dates)
+    if len_all_index_dates == 1:
+        index_date = ohlc_df.index[-1].date()
+        chart_file_name = f"profile_{ticker}_{index_date}.png"
+    else:
+        chart_file_name = f"profile_{ticker}_{len_all_index_dates}d.png"
+    figure.write_image(chart_file_name)
 
 
 if __name__ == "__main__":
 
-    # data = generate_sample_data()
-    TICKER = "IWM"
-    data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="15m")
+    TICKER = "TLT"
+
+    data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="5m")
     print(data.head())
     print(data.tail())
-    print(max(data.index).day)
-    chart = create_candlestick_volume_chart(data, ticker=TICKER)
-    chart.write_image(f"market_volume_profile_{TICKER}.png")
+
+    sorted_dates = sorted(list(set(data.index.date)))  # type: ignore
+    if len(sorted_dates) != 5:
+        raise ValueError(
+            f"We ask Yahoo Finance for 5 days of data, so len should be 5, {sorted_dates=}"
+        )
+
+    # Draw one-day profile for yesterday
+    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-1]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+
+    # Draw one-day profile for the day before yesterday
+    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-2]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+
+    # Draw one-day profile for the day 3 days ago
+    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-3]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+
+    # Draw two-days profile for the day before yesterday and yesterday
+    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-2]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+
+    # Draw three-days profile
+    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-3]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
