@@ -21,8 +21,8 @@ def _add_last_min_max_dates(
         or "is_max" not in df.columns
     ):
         df = fill_is_min_max(df=df)
-    last_min_date = df[df["is_min"] == True].index.max()
-    last_max_date = df[df["is_max"] == True].index.max()
+    last_min_date = df[df["is_min"] == True].index.max()  # pylint: disable=C0121
+    last_max_date = df[df["is_max"] == True].index.max()  # pylint: disable=C0121
     anchor_dates.update({last_min_date, last_max_date})
 
     # NOTE return not only anchor_dates but also pd.DataFrame,
@@ -51,18 +51,22 @@ def _preprocess_anchor_dates(
         if anchor_date[0] == "x":
             min_anchor_date = pd.to_datetime(anchor_date[1:])
     anchor_points = [
-        anchor_date[1:]
-        if not isinstance(anchor_date, datetime.datetime) and anchor_date[0] == "x"
-        else anchor_date
+        (
+            anchor_date[1:]
+            if not isinstance(anchor_date, datetime.datetime) and anchor_date[0] == "x"
+            else anchor_date
+        )
         for anchor_date in anchor_dates
     ]
-    anchor_points = [
-        pd.to_datetime(anchor_date)
-        if not isinstance(anchor_date, datetime.datetime)
-        else anchor_date
+    anchor_points_ts: List[pd.Timestamp] = [
+        (
+            pd.to_datetime(anchor_date)
+            if not isinstance(anchor_date, datetime.datetime)
+            else anchor_date
+        )
         for anchor_date in anchor_points
     ]
-    return set(anchor_points), min_anchor_date
+    return set(anchor_points_ts), min_anchor_date
 
 
 def vwaps_plot_build_save(
@@ -74,7 +78,7 @@ def vwaps_plot_build_save(
     file_name: str = DEFAULT_RESULTS_FILE,
     print_df: bool = True,
     hide_extended_hours: bool = False,
-):
+) -> None:
     """
     1. Transform every element of anchor_dates to pd.Timestamp.
     2. Add a new column with a typical price.
@@ -91,7 +95,7 @@ def vwaps_plot_build_save(
 
     # Otherwise, TypeError: Invalid comparison between
     # dtype=datetime64[ns, America/New_York] and Timestamp
-    df.index = df.index.tz_convert(None)
+    df.index = df.index.tz_convert(None)  # type: ignore
 
     anchor_points, min_threshold_point = _preprocess_anchor_dates(
         anchor_dates=anchor_dates
