@@ -19,15 +19,26 @@ def _get_volume_profile_value_region_indexes(
     """
     v_p_sum = np.sum(volume_profile)
     value_region_sum = v_p_sum * VALUE_REGION_PERCENTILE
-    v_r_index_first = 0
-    v_r_index_last = len(volume_profile) - 1
+    volume_subtracted_from_bottom = volume_subtracted_from_top = 0
+    v_r_index_bottom = 0
+    v_r_index_top = len(volume_profile) - 1
+    iteration_num = 0
     while v_p_sum > value_region_sum:
-        v_p_sum = v_p_sum - volume_profile[v_r_index_first]
-        v_r_index_first = v_r_index_first + 1
-        if v_p_sum > value_region_sum:
-            v_p_sum = v_p_sum - volume_profile[v_r_index_last]
-            v_r_index_last = v_r_index_last - 1
-    return v_r_index_first, v_r_index_last
+        # NOTE Trying tu subtract equal volumes from top and bottom of the histogram
+        while volume_subtracted_from_bottom <= volume_subtracted_from_top:
+            if v_p_sum <= value_region_sum:
+                break
+            volume_subtracted_from_bottom += volume_profile[v_r_index_bottom]
+            v_p_sum -= volume_profile[v_r_index_bottom]
+            v_r_index_bottom += 1
+        while volume_subtracted_from_top <= volume_subtracted_from_bottom:
+            if v_p_sum <= value_region_sum:
+                break
+            volume_subtracted_from_top += volume_profile[v_r_index_top]
+            v_p_sum -= volume_profile[v_r_index_top]
+            v_r_index_top -= 1
+        iteration_num += 1
+    return v_r_index_bottom, v_r_index_top
 
 
 def get_volume_profile_colors(volume_profile: np.ndarray) -> List[str]:
@@ -152,7 +163,7 @@ def draw_profile_of_data(ohlc_df: pd.DataFrame, ticker: str) -> None:
 
 if __name__ == "__main__":
 
-    TICKER = "SPY"
+    TICKER = "EWZ"
 
     data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="1m")
     print(data.head())
@@ -168,21 +179,21 @@ if __name__ == "__main__":
     data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-1]]  # type: ignore
     draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # # Draw one-day profile for the day before yesterday
-    # data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-2]]  # type: ignore
-    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # Draw one-day profile for the day before yesterday
+    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-2]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # # Draw one-day profile for the day 3 days ago
-    # data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-3]]  # type: ignore
-    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # Draw one-day profile for the day 3 days ago
+    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-3]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # # Draw two-days profile for the day before yesterday and yesterday
-    # data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-2]]  # type: ignore
-    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # Draw two-days profile for the day before yesterday and yesterday
+    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-2]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # # Draw three-days profile
-    # data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-3]]  # type: ignore
-    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # Draw three-days profile
+    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-3]]  # type: ignore
+    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # # Draw five-days profile
-    # draw_profile_of_data(ohlc_df=data, ticker=TICKER)
+    # Draw five-days profile
+    draw_profile_of_data(ohlc_df=data, ticker=TICKER)
