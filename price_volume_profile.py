@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,6 +7,40 @@ from plotly.graph_objects import Figure
 from plotly.subplots import make_subplots
 
 from import_ohlc import get_ohlc_from_yf
+
+VALUE_REGION_PERCENTILE = 0.7
+
+
+def _get_volume_profile_value_region_indexes(
+    volume_profile: np.ndarray,
+) -> Tuple[int, int]:
+    """
+    Get first and last index of the middle VALUE_REGION_PERCENTILE of the input volume profile.
+    """
+    v_p_sum = np.sum(volume_profile)
+    value_region_sum = v_p_sum * VALUE_REGION_PERCENTILE
+    v_r_index_first = 0
+    v_r_index_last = len(volume_profile) - 1
+    while v_p_sum > value_region_sum:
+        v_p_sum = v_p_sum - volume_profile[v_r_index_first]
+        v_r_index_first = v_r_index_first + 1
+        if v_p_sum > value_region_sum:
+            v_p_sum = v_p_sum - volume_profile[v_r_index_last]
+            v_r_index_last = v_r_index_last - 1
+    return v_r_index_first, v_r_index_last
+
+
+def get_volume_profile_colors(volume_profile: np.ndarray) -> List[str]:
+    v_r_index_first, v_r_index_last = _get_volume_profile_value_region_indexes(
+        volume_profile=volume_profile
+    )
+    volume_bar_colors = list()
+    for counter in range(len(volume_profile)):
+        if (counter >= v_r_index_first) and (counter <= v_r_index_last):
+            volume_bar_colors.append("green")
+        else:
+            volume_bar_colors.append("lightgray")
+    return volume_bar_colors
 
 
 def create_candlestick_volume_chart(
@@ -37,10 +71,7 @@ def create_candlestick_volume_chart(
         subplot_titles=("Price Profile", "Volume Profile", title_main),
     )
 
-    volume_bar_colors = [
-        "green" if vol > np.percentile(volume_profile, 70) else "lightgray"
-        for vol in volume_profile
-    ]
+    volume_bar_colors = get_volume_profile_colors(volume_profile=volume_profile)
 
     fig.add_trace(
         go.Bar(
@@ -121,9 +152,9 @@ def draw_profile_of_data(ohlc_df: pd.DataFrame, ticker: str) -> None:
 
 if __name__ == "__main__":
 
-    TICKER = "TLT"
+    TICKER = "SPY"
 
-    data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="5m")
+    data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="1m")
     print(data.head())
     print(data.tail())
 
@@ -137,18 +168,21 @@ if __name__ == "__main__":
     data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-1]]  # type: ignore
     draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # Draw one-day profile for the day before yesterday
-    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-2]]  # type: ignore
-    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # # Draw one-day profile for the day before yesterday
+    # data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-2]]  # type: ignore
+    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # Draw one-day profile for the day 3 days ago
-    data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-3]]  # type: ignore
-    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # # Draw one-day profile for the day 3 days ago
+    # data_slice: pd.DataFrame = data[data.index.date == sorted_dates[-3]]  # type: ignore
+    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # Draw two-days profile for the day before yesterday and yesterday
-    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-2]]  # type: ignore
-    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # # Draw two-days profile for the day before yesterday and yesterday
+    # data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-2]]  # type: ignore
+    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
 
-    # Draw three-days profile
-    data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-3]]  # type: ignore
-    draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+    # # Draw three-days profile
+    # data_slice: pd.DataFrame = data[data.index.date >= sorted_dates[-3]]  # type: ignore
+    # draw_profile_of_data(ohlc_df=data_slice, ticker=TICKER)
+
+    # # Draw five-days profile
+    # draw_profile_of_data(ohlc_df=data, ticker=TICKER)
