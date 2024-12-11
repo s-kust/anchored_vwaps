@@ -158,12 +158,13 @@ def draw_profile_of_data(ohlc_df: pd.DataFrame, ticker: str) -> None:
         chart_file_name = f"profile_{ticker}_{index_date}.png"
     else:
         chart_file_name = f"profile_{ticker}_{len_all_index_dates}d.png"
+    print(chart_file_name)
     figure.write_image(chart_file_name)
 
 
 if __name__ == "__main__":
 
-    TICKER = "EWZ"
+    TICKER = "IWM"
 
     data = get_ohlc_from_yf(ticker=TICKER, period="5d", interval="1m")
     print(data.head())
