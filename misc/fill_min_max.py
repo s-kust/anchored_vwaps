@@ -57,4 +57,19 @@ def fill_is_min_max(df: pd.DataFrame) -> pd.DataFrame:
                 current_candidate["extremum_to_detect"] = "max"
                 current_candidate["date"] = i
                 current_candidate["price_val"] = row["Close"]
+
+        # internal_df.loc[internal_df.index == i, "extremum_to_detect"] = (
+        #     current_candidate["extremum_to_detect"]
+        # )
+        # internal_df.loc[internal_df.index == i, "price_val"] = current_candidate[
+        #     "price_val"
+        # ]
+        # internal_df.loc[internal_df.index == i, "extremum_candidate_date"] = (
+        #     current_candidate["date"]
+        # )
+
+    # print(f"{current_candidate['extremum_to_detect']=}")
+    # print(f"{current_candidate['price_val']=}")
+    # print(f"{current_candidate['date']=}")
+    # internal_df.to_csv("temp.csv")
     return internal_df

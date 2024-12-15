@@ -26,6 +26,10 @@ def add_atr_col_to_df(
     data["tr"] = data[["tr0", "tr1", "tr2"]].max(axis=1)
     data["tr"] = round(data["tr"], 2)
 
+    # today use yesterday's ATR -
+    # this operation is currently essential, maybe remove later
+    data["tr"] = data["tr"].shift()
+
     if exponential:
         data[f"atr_{n}"] = (
             data["tr"].ewm(alpha=2 / (n + 1), min_periods=n, adjust=False).mean()

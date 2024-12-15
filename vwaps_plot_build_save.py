@@ -130,7 +130,7 @@ def vwaps_plot_build_save(
     df = df[df.index >= min_threshold_point]
 
     if print_df:
-        print(df[["Open", "High", "Low", "Close", "Volume"]])
+        print(df[["Open", "High", "Low", "Close", "Volume", f"atr_{ATR_SMOOTHING_N}"]])
     # df.to_excel("DF_before_plot_VWAP.xlsx")
     del df["TypicalMultiplyVolume"]
     del df["Typical"]
